@@ -36,10 +36,10 @@ class _LibraryScreenState extends State<LibraryScreen> {
 
   List<Map<String, dynamic>> _internationalData = [
     // 국제캠퍼스 데이터 유지
-    {'name': '1F 제1열람실', 'total': 410, 'occupied': 10, 'available': 190, 'time': '00:00~ 24:00', 'usage': 0.05, 'extra': '컴퓨터'},
+    {'name': '1F 제1열람실(국제)', 'total': 410, 'occupied': 10, 'available': 190, 'time': '00:00~ 24:00', 'usage': 0.05, 'extra': '컴퓨터'},
     {'name': '1F 벗터', 'total': 152, 'occupied': 30, 'available': 70, 'time': '06:00~ 24:00', 'usage': 0.30, 'extra': '컴퓨터'},
     {'name': '1F 혜윰', 'total': 188, 'occupied': 30, 'available': 70, 'time': '06:00~ 24:00', 'usage': 0.30, 'extra': '컴퓨터'},
-    {'name': '2F 제2열람실', 'total': 326, 'occupied': 30, 'available': 70, 'time': '06:00~ 24:00', 'usage': 0.30, 'extra': '컴퓨터'},
+    {'name': '2F 제2열람실(국제)', 'total': 326, 'occupied': 30, 'available': 70, 'time': '06:00~ 24:00', 'usage': 0.30, 'extra': '컴퓨터'},
   ];
   
   void convertServerDataToSeoul(List<Map<String, dynamic>> data) {
