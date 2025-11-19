@@ -8,8 +8,16 @@ import 'package:http/http.dart' as http;
 class SeatMapScreen extends StatefulWidget {
   final Map<String, dynamic> libraryItem;
   final int selectedCampus;
+  final int userId;
+  final String location;
 
-  const SeatMapScreen({super.key, required this.libraryItem, required this.selectedCampus});
+  const SeatMapScreen({
+    super.key, 
+    required this.libraryItem, 
+    required this.selectedCampus, 
+    required this.userId,
+    required this.location
+  });
 
   String get _campusName {
     return selectedCampus == 1 ? '국제캠퍼스' : '서울캠퍼스';
@@ -29,45 +37,11 @@ class _SeatMapScreenState extends State<SeatMapScreen> {
     super.initState();
     _fetchSeatStatus();
   }
-
-
+  
   Future<void> _fetchSeatStatus() async {
     final String roomName = widget.libraryItem['name'] as String? ?? '0';
-    String index = '0';
+    String index = changeIndex(roomName);
 
-    switch(roomName) {
-      case '1F 제1열람실':
-        index = '1';
-        break;
-      case '1F 집중열람실':
-        index = '2';
-        break;
-      case '2F 제2열람실':
-        index = '3';
-        break;
-      case '2F 제3열람실':
-        index = '4';
-        break;
-      case '4F 제4열람실':
-        index = '5';
-        break;
-      case '4F 제4열람실(대학원)':
-        index = '12';
-        break;
-      case '1F 제1열람실(국제)':
-        index = '8';
-        break;
-      case '1F 벗터':
-        index = '10';
-        break;
-      case '2F 혜윰':
-        index = '11';
-        break;
-      case '2F 제2열람실(국제)':
-        index = '9';
-        break;
-    }
-  
     try {
       final uri = Uri.parse('http://localhost:3000/seats/$index');
       final res = await http.get(uri);
@@ -90,6 +64,37 @@ class _SeatMapScreenState extends State<SeatMapScreen> {
     } catch(e) {
       setState(() { _isLoading = false; });
       debugPrint('Error fetching seat data: $e');
+    }
+  }
+
+  Future<void> _reserveSeat(int seatNumber, int userId, String location) async {
+    final uri = Uri.parse("http://localhost:3000/seats");
+    String index = changeIndex(location);
+    final bodyData = jsonEncode({
+      'seatId': seatNumber,
+      'userId': userId, 
+      'location': index,
+    });
+
+    try {
+      final res = await http.post(
+        uri, 
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: bodyData
+      );
+      if(res.statusCode == 200 || res.statusCode == 201) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${seatNumber}번 좌석이 예약되었습니다.', style: const TextStyle(color: Colors.white)),
+            backgroundColor: Colors.blue.shade700,
+            duration: const Duration(seconds: 2)
+          )
+        );
+      }
+    } catch(e) {
+      debugPrint('$e');
     }
   }
 
@@ -149,8 +154,17 @@ Widget _buildSeatMapLayout(int totalSeats) {
 
         return GestureDetector(
           onTap: () {
-            // 좌석 선택 기능 추가
-            debugPrint('Seat $seatNumber selected. Status: ${isOccupied ? "Occupied" : isAvailable ? "Available" : "Unknown"}');
+            if(isOccupied) {
+              _reserveSeat(seatNumber, widget.userId, widget.location);
+            } else if (isAvailable) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('빈 좌석입니다.', style: TextStyle(color: Colors.black)),
+                  backgroundColor: Colors.yellow.shade200,
+                  duration: const Duration(seconds: 2),
+                )
+              );
+            }
           },
           child: Container(
             width: 35,
@@ -238,6 +252,43 @@ Widget _buildSeatMapLayout(int totalSeats) {
       ),
     );
   }
+  String changeIndex(String roomName) {
+    String index = '0';
+    switch(roomName) {
+      case '1F 제1열람실':
+        index = '1';
+        break;
+      case '1F 집중열람실':
+        index = '2';
+        break;
+      case '2F 제2열람실':
+        index = '3';
+        break;
+      case '2F 제3열람실':
+        index = '4';
+        break;
+      case '4F 제4열람실':
+        index = '5';
+        break;
+      case '4F 제4열람실(대학원)':
+        index = '12';
+        break;
+      case '1F 제1열람실(국제)':
+        index = '8';
+        break;
+      case '1F 벗터':
+        index = '10';
+        break;
+      case '2F 혜윰':
+        index = '11';
+        break;
+      case '2F 제2열람실(국제)':
+        index = '9';
+        break;
+    }
+    return index;
+  }
+
 }
 //   @override
 //   Widget build(BuildContext context) {

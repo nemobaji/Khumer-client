@@ -7,7 +7,13 @@ import '../screens/seat_map_screen.dart';
 import 'package:http/http.dart' as http;
 
 class LibraryScreen extends StatefulWidget {
-  const LibraryScreen({super.key});
+  final int userId;
+  final String userName;
+  const LibraryScreen({
+    super.key,
+    required this.userId,
+    required this.userName
+  });
 
   @override
   State<LibraryScreen> createState() => _LibraryScreenState();
@@ -163,10 +169,10 @@ class _LibraryScreenState extends State<LibraryScreen> {
   }
   
   // 좌석배정 버튼 클릭 시 SeatMapScreen으로 이동하는 함수
-  void _navigateToSeatMap(Map<String, dynamic> item) {
+  void _navigateToSeatMap(Map<String, dynamic> item, String location, int userId) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => SeatMapScreen(libraryItem: item, selectedCampus: _selectedCampus,),
+        builder: (context) => SeatMapScreen(libraryItem: item, selectedCampus: _selectedCampus, userId: userId, location: location,),
       ),
     );
   }
@@ -333,7 +339,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
                           children: [
                             // 탭 이동 함수 연결
                             ElevatedButton(
-                              onPressed: () => _navigateToSeatMap(item),
+                              onPressed: () => _navigateToSeatMap(item, item['name'], widget.userId),
                               style: Theme.of(context).elevatedButtonTheme.style,
                               child: const Text('좌석예약'),
                             ),

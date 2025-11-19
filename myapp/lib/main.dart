@@ -1,7 +1,7 @@
 // main.dart
 
 import 'package:flutter/material.dart';
-import 'screens/library_screen.dart'; // LibraryScreen을 import 합니다.
+import 'package:myapp/screens/user_info_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -58,7 +58,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const LibraryScreen(),
+      home: const UserInfoScreen(),
     );
   }
 }
