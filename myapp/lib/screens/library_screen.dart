@@ -1,9 +1,9 @@
 // screens/library_screen.dart
 
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import '../screens/seat_map_screen.dart'; 
+import '../screens/user_reservation_dialog.dart';
 import 'package:http/http.dart' as http;
 
 class LibraryScreen extends StatefulWidget {
@@ -32,20 +32,20 @@ class _LibraryScreenState extends State<LibraryScreen> {
   // 테이블 데이터 예시 (기능은 유지)
   List<Map<String, dynamic>> _seoulData = [
     // 서울캠퍼스 데이터 유지
-    {'name': '1F 제1열람실', 'total': 202, 'occupied': 49, 'available': 361, 'time': '00:00~ 24:00', 'usage': 0.12, 'extra': '24'},
-    {'name': '1F 집중열람실', 'total': 46, 'occupied': 50, 'available': 102, 'time': '06:00~ 24:00', 'usage': 0.33, 'extra': ''},
-    {'name': '2F 제2열람실', 'total': 315, 'occupied': 25, 'available': 163, 'time': '06:00~ 24:00', 'usage': 0.13, 'extra': '컴퓨터'},
-    {'name': '2F 제3열람실', 'total': 151, 'occupied': 17, 'available': 309, 'time': '06:00~ 24:00', 'usage': 0.05, 'extra': '컴퓨터'},
-    {'name': '4F 제4열람실', 'total': 137, 'occupied': 17, 'available': 309, 'time': '06:00~ 24:00', 'usage': 0.05, 'extra': ''},
-    {'name': '4F 제4열람실(대학원)', 'total': 12, 'occupied': 17, 'available': 309, 'time': '06:00~ 24:00', 'usage': 0.05, 'extra': ''},
+    {'name': '1F 제1열람실', 'total': 0, 'occupied': 0, 'available': 0, 'time': '00:00~ 24:00', 'usage': 0.12, 'extra': '24'},
+    {'name': '1F 집중열람실', 'total': 0, 'occupied': 0, 'available': 0, 'time': '06:00~ 24:00', 'usage': 0.33, 'extra': ''},
+    {'name': '2F 제2열람실', 'total': 0, 'occupied': 0, 'available': 0, 'time': '06:00~ 24:00', 'usage': 0.13, 'extra': '컴퓨터'},
+    {'name': '2F 제3열람실', 'total': 0, 'occupied': 0, 'available': 0, 'time': '06:00~ 24:00', 'usage': 0.05, 'extra': '컴퓨터'},
+    {'name': '4F 제4열람실', 'total': 0, 'occupied': 0, 'available': 0, 'time': '06:00~ 24:00', 'usage': 0.05, 'extra': ''},
+    {'name': '4F 제4열람실(대학원)', 'total': 0, 'occupied': 0, 'available': 0, 'time': '06:00~ 24:00', 'usage': 0.05, 'extra': ''},
   ];
 
   List<Map<String, dynamic>> _internationalData = [
     // 국제캠퍼스 데이터 유지
-    {'name': '1F 제1열람실(국제)', 'total': 410, 'occupied': 10, 'available': 190, 'time': '00:00~ 24:00', 'usage': 0.05, 'extra': '컴퓨터'},
-    {'name': '1F 벗터', 'total': 152, 'occupied': 30, 'available': 70, 'time': '06:00~ 24:00', 'usage': 0.30, 'extra': '컴퓨터'},
-    {'name': '1F 혜윰', 'total': 188, 'occupied': 30, 'available': 70, 'time': '06:00~ 24:00', 'usage': 0.30, 'extra': '컴퓨터'},
-    {'name': '2F 제2열람실(국제)', 'total': 326, 'occupied': 30, 'available': 70, 'time': '06:00~ 24:00', 'usage': 0.30, 'extra': '컴퓨터'},
+    {'name': '1F 제1열람실(국제)', 'total': 0, 'occupied': 0, 'available': 0, 'time': '00:00~ 24:00', 'usage': 0.05, 'extra': '컴퓨터'},
+    {'name': '1F 벗터', 'total': 0, 'occupied': 0, 'available': 0, 'time': '06:00~ 24:00', 'usage': 0.30, 'extra': '컴퓨터'},
+    {'name': '1F 혜윰', 'total': 0, 'occupied': 0, 'available': 0, 'time': '06:00~ 24:00', 'usage': 0.30, 'extra': '컴퓨터'},
+    {'name': '2F 제2열람실(국제)', 'total': 0, 'occupied': 0, 'available': 0, 'time': '06:00~ 24:00', 'usage': 0.30, 'extra': '컴퓨터'},
   ];
   
   void convertServerDataToSeoul(List<Map<String, dynamic>> data) {
@@ -182,7 +182,6 @@ class _LibraryScreenState extends State<LibraryScreen> {
     final List<Map<String, dynamic>> currentData =
         _selectedCampus == 0 ? _seoulData : _internationalData;
 
-    // 합계 계산 로직 유지
     int totalSum = currentData.fold(0, (sum, item) => sum + item['total'] as int);
     int occupiedSum = currentData.fold(0, (sum, item) => sum + item['occupied'] as int);
     int availableSum = currentData.fold(0, (sum, item) => sum + item['available'] as int);
@@ -199,6 +198,28 @@ class _LibraryScreenState extends State<LibraryScreen> {
             ),
           ],
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.person),
+            tooltip: '내 예약 현황',
+            onPressed: () async {
+              final result = await showDialog(
+                context: context,
+                builder: (context) => UserReservationDialog(
+                  userId: widget.userId,
+                  userName: widget.userName,
+                ),
+              );
+
+              if (_selectedCampus == 0) {
+                fetchSeoulData();
+              } else {
+                fetchInternationalData();
+              }
+            },
+          ),
+          const SizedBox(width: 16),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -265,7 +286,6 @@ class _LibraryScreenState extends State<LibraryScreen> {
             const SizedBox(height: 24),
             const SizedBox(height: 24),
             
-            // 중앙도서관 테이블 섹션
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
@@ -275,7 +295,6 @@ class _LibraryScreenState extends State<LibraryScreen> {
             ),
             const SizedBox(height: 12),
 
-            // 테이블 데이터를 리스트 형태로 표시 (기존 로직 유지)
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -337,7 +356,6 @@ class _LibraryScreenState extends State<LibraryScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            // 탭 이동 함수 연결
                             ElevatedButton(
                               onPressed: () => _navigateToSeatMap(item, item['name'], widget.userId),
                               style: Theme.of(context).elevatedButtonTheme.style,
@@ -365,7 +383,6 @@ class _LibraryScreenState extends State<LibraryScreen> {
             ),
             const SizedBox(height: 24),
 
-            // 합계 섹션 (기존 로직 유지)
             Card(
               margin: const EdgeInsets.symmetric(horizontal: 16.0),
               color: Colors.white,

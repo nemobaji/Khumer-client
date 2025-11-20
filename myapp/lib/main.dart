@@ -15,9 +15,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: '경희대학교 중앙도서관',
       theme: ThemeData(
-        // 경희대학교를 연상시키는 블루 계열의 주 색상
         primaryColor: const Color.fromARGB(255, 11, 96, 166), 
-        // 탭 선택 시 사용될 강조 색상 (빨간색)
         hintColor: const Color.fromARGB(255, 217, 42, 30), 
         scaffoldBackgroundColor: Colors.grey[50],
         appBarTheme: const AppBarTheme(
